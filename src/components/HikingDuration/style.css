@@ -1,0 +1,11 @@
+.c-icon-text-group {
+    display: flex;
+    align-items: center;
+    padding-top: 12px;
+    gap: 12px;
+}
+
+.c-icon-text {
+    display: flex;
+    gap: 4px;
+}
