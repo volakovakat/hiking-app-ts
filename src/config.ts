@@ -1,0 +1,1 @@
+export const imgBaseUrl : string = 'https://kngnsssmzxrgvdvygzwv.supabase.co/storage/v1/object/public/images/';
