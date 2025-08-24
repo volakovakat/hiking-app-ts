@@ -12,22 +12,30 @@ import { Trip } from '../../functions/getTrips';
 import { Location } from "../../functions/getLocations";
 
 import {imgBaseUrl} from "../../config";
+import { computeCarTimeHours, LatLng } from "../../functions/geo";
 
 interface TripCardProps {
     trip: Trip;
     location: Location;
+    originCoords?: LatLng;
 }
 
-const TripCard: React.FC<TripCardProps> = ({ trip, location}) => {
-    const { ascent, descent, header, image, info, hikeTimeRange, carTimeRange, parking, map, mapPreview } = trip;
+const TripCard: React.FC<TripCardProps> = ({ trip, location, originCoords}) => {
+    const { ascent, descent, header, image, info, hikeTimeRange, carTimeRange, hikeLength, parking, map, mapPreview, location_id, startPoint } = trip;
 
     const { name } = location;
+
+    const effectiveCarTimeRange = React.useMemo(() => {
+        if (!originCoords || !startPoint) return carTimeRange;
+        const h = computeCarTimeHours(originCoords, startPoint);
+        return { value: Number(h.toFixed(1)), unit: 'h' };
+    }, [originCoords, startPoint, carTimeRange]);
 
     return (
         <Card sx={{ width: 345, height: 311 }}>
             <CardMedia
                 sx={{ height: 140 }}
-                image={imgBaseUrl + image}
+                image={image}
                 title="map"
             />
             <CardContent>
@@ -35,11 +43,18 @@ const TripCard: React.FC<TripCardProps> = ({ trip, location}) => {
                     {header}
                 </Typography>
                 <Chip label={`${name}`} variant="outlined" color="primary" size="small" />
-                <HikingDuration hikeTimeRange={hikeTimeRange} carTimeRange={carTimeRange} ascent={ascent}
-                                descent={descent} />
+                <Typography variant="subtitle1" component="span" color="text.secondary" sx={{ ml: 1 }}>
+                    {hikeLength.value} {hikeLength.unit}
+                </Typography>
+                <HikingDuration
+                    hikeTimeRange={hikeTimeRange}
+                    carTimeRange={effectiveCarTimeRange}
+                    ascent={ascent}
+                    descent={descent}
+                />
             </CardContent>
             <CardActions>
-                <InfoModal trip={{ ascent, descent, header, image, info, mapPreview, hikeTimeRange, carTimeRange }} />
+                <InfoModal trip={{ ascent, descent, header, image, info, mapPreview, hikeTimeRange, carTimeRange: effectiveCarTimeRange, hikeLength, location_id }} />
                 <Button size="small" href={map} target="_blank">Trasa</Button>
                 <Button size="small" href={parking} target="_blank">Parking</Button>
             </CardActions>

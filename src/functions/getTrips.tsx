@@ -1,9 +1,19 @@
-/*import {getSupabase} from "./supabase";
+import { tripsMock } from "./mockData";
 
-export const getTrips = getSupabase.from('trips').select('*');*/
+export interface TimeWithUnit {
+    value: number;
+    unit: string; // např. "h"
+}
 
+export interface LengthWithUnit {
+    value: number;
+    unit: string; // např. "km"
+}
 
-import { getSupabase } from "./getSupabase";
+export interface LatLng {
+    lat: number;
+    lng: number;
+}
 
 export interface Trip {
     id: string;
@@ -13,23 +23,17 @@ export interface Trip {
     image: string;
     info: string;
     location_id: string;
-    hikeTimeRange: number;
-    carTimeRange: number;
+    hikeTimeRange: TimeWithUnit;
+    carTimeRange: TimeWithUnit;
+    hikeLength: LengthWithUnit;
+    startPoint: LatLng;
     map: string;
     mapPreview: string;
     parking: string;
 }
 
 export const getTrips = async (): Promise<Trip[]> => {
-    const { data, error } = await getSupabase
-        .from('trips')
-        .select('*');
-
-    if (error) {
-        console.error("Error fetching trips:", error);
-        throw error;
-    }
-
-    return data as Trip[];
+    // Vrátí mockovaná data místo volání vzdálené DB
+    return tripsMock as unknown as Trip[];
 };
 
